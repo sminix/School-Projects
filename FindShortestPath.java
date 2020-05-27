@@ -37,17 +37,19 @@ public class FindShortestPath {
 		ArrayList<Integer> dist = new ArrayList<Integer>(); //Array list of distances from source to each vertex
 		ArrayList<Boolean> visited = new ArrayList<Boolean>(); //Array list if edge is included in Shortest path tree
 		
-		ArrayList<Integer> path = new ArrayList<Integer>();
-		
-		//populate both arraylists
+		ArrayList<ArrayList<Integer>> paths = new ArrayList<ArrayList<Integer>>();
+
+		//populate all arraylists
 		for (int i = 0; i < mapSize; i ++){
 			dist.add(i, Integer.MAX_VALUE); //distances are all infinite for now
 			visited.add(i, false);			//nodes are not in the shortest path tree yet
+			paths.add(i, new ArrayList<Integer>());
 		}
-		
 		int source = root;
+	
+		paths.get(root - 1).add(root); //source is added to trail list
 		
-		path.add(source); //source is adderd to path list
+		//paths.set(source - 1, trail); //Add trail to paths list
 		dist.set(source - 1, 0); //source vertex has a distance of 0
 		visited.set(source - 1, true); //and has been visited
 		
@@ -58,44 +60,43 @@ public class FindShortestPath {
 		}
 		
 		while(q.isEmpty() != true){	//while the queue is not empty
-			
-			PriorityQueue1.sort(q);	//sort it
+
+			PriorityQueue1.sort(q);	//sort queue
 			Edge curr = PriorityQueue1.poll(q);	//curr is top of priority queue
 
 			source = curr.source;	//source vertex of edge
 			int target = curr.dest;	//target vertex polled edge
 			int weight = curr.weight; //weight is cost of this edge
 			
-			
+			ArrayList<Integer> addition = new ArrayList<Integer>(paths.get(source - 1)); //addition is initialize using list from paths of current source
 			int sourceWeight = dist.get(source - 1); //get source and destination weight from distance array
 			int destWeight = dist.get(target - 1);
 			
+			addition.add(target); //add target to list of nodes from source
 			
 			
 			if (sourceWeight + weight < destWeight){ //if the source weight plus the edge weight is less than the current weight to the destination
-				destWeight = sourceWeight + weight;	//update destionation weight, because smaller path is known
+				destWeight = sourceWeight + weight;	//update destination weight, because smaller path is known
 				dist.set(target - 1, destWeight);
-				
+	
 			}
-
-			
 			if (visited.get(target - 1) == false){ //if the target vertex has not been visited yet
 				for (int count = 0; count < graph.get(target).size(); count ++){
 					Edge e = graph.get(target).get(count); //get each edge from the target vertex
 					q.add(e); //add all edges to the queue
 				}
-				
 				visited.set(target - 1, true); //the edges have been added to the queue, so the vertex is considered visited
-				path.add(target); //add target to path list
-				
+				paths.set(target - 1, addition); //add addition to list of paths from root to target
 			}
-			
+
 			if (visited.get(dest - 1) == true){ //if target node has been visited, clear the queue
 				q.clear(); //clearing the queue stops the while loop
 			}
 			
 		}
 		//This section writes to the output file
+		ArrayList<Integer> path = new ArrayList<Integer>(paths.get(dest - 1));
+		
 		BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
 		writer.write(Integer.toString(dist.get(dest - 1)));
 		writer.newLine();
