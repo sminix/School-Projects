@@ -1,2 +1,2 @@
-# School-Projects
-Some progams classes like intro classes and algorithms
+# Dijkstra's-Project
+Dijkstra's algorithm from Intro to Algorithms course
